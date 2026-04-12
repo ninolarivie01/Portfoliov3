@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nino Larivière-Gillet — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════
+   TOKENS
+═══════════════════════════ */
+:root {
+  --bg:         #0d0d11;
+  --bg-alt:     #13131a;
+  --surface:    #17171f;
+  --surface-2:  #1e1e28;
+  --border:     rgba(255,255,255,0.07);
+  --border-md:  rgba(255,255,255,0.13);
+  --text:       #e2e2ea;
+  --text-2:     #9898b8;
+  --muted:      #46465e;
+  --accent:     #818cf8;
+  --accent-2:   #a78bfa;
+  --accent-dim: rgba(129,140,248,0.1);
+  --accent-glow:rgba(129,140,248,0.2);
+  --shadow:     rgba(0,0,0,0.45);
+  --nav-bg:     rgba(13,13,17,0.92);
+}
+[data-theme="light"] {
+  --bg:         #f7f6f2;
+  --bg-alt:     #efede8;
+  --surface:    #ffffff;
+  --surface-2:  #f2f0ec;
+  --border:     rgba(0,0,0,0.06);
+  --border-md:  rgba(0,0,0,0.11);
+  --text:       #1c1c20;
+  --text-2:     #72728a;
+  --muted:      #b8b8cc;
+  --accent:     #4338ca;
+  --accent-2:   #6d28d9;
+  --accent-dim: rgba(67,56,202,0.07);
+  --accent-glow:rgba(67,56,202,0.13);
+  --shadow:     rgba(0,0,0,0.07);
+  --nav-bg:     rgba(247,246,242,0.94);
+}
+
+/* ═══════════════════════════
+   BASE
+═══════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:76px;}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);color:var(--text);
+  line-height:1.65;overflow-x:hidden;
+  transition:background .35s,color .35s;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:#fff;}
+::-webkit-scrollbar{width:2px;}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px;}
+
+/* ═══════════════════════════
+   PROGRESS
+═══════════════════════════ */
+#prog{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  z-index:9999;transition:width .1s linear;
+}
+
+/* ═══════════════════════════
+   NAV
+═══════════════════════════ */
+.nav{
+  position:fixed;top:0;width:100%;height:68px;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 3rem;transition:all .35s;
+}
+.nav.on{
+  background:var(--nav-bg);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.nav-logo{
+  font-size:.95rem;font-weight:700;letter-spacing:-.02em;
+  color:var(--text);text-decoration:none;
+  display:flex;align-items:center;gap:9px;
+}
+.nav-logo-mark{
+  width:30px;height:30px;background:var(--accent-dim);
+  border:1px solid var(--border-md);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.62rem;font-weight:500;color:var(--accent);
+  transition:all .25s;
+}
+.nav-logo:hover .nav-logo-mark{background:var(--accent);color:#fff;}
+
+.nav-links{display:flex;list-style:none;gap:.1rem;}
+.nav-links a{
+  font-size:.78rem;font-weight:500;color:var(--text-2);
+  text-decoration:none;padding:6px 13px;border-radius:8px;
+  transition:all .2s;
+}
+.nav-links a:hover{color:var(--text);background:var(--accent-dim);}
+
+.nav-r{display:flex;align-items:center;gap:10px;}
+
+/* ── Toggle premium ──────── */
+/*
+  Principe : un bouton unique.
+  En dark → affiche l'icône soleil (pour aller en clair).
+  En light → affiche l'icône lune (pour aller en sombre).
+  Les deux icônes se croisent avec une transition verticale douce.
+*/
+.theme-btn{
+  position:relative;
+  width:38px;height:38px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border-md);
+  cursor:pointer;overflow:hidden;
+  transition:background .25s,border-color .25s,box-shadow .25s;
+  display:flex;align-items:center;justify-content:center;
+}
+.theme-btn:hover{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-dim);
+}
+.t-icon{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s;
+}
+/* Dark mode → soleil visible (pour switcher vers light) */
+[data-theme="dark"]  .t-sun { transform:translateY(0);   opacity:1; }
+[data-theme="dark"]  .t-moon{ transform:translateY(110%);opacity:0; }
+/* Light mode → lune visible (pour switcher vers dark) */
+[data-theme="light"] .t-moon{ transform:translateY(0);   opacity:1; }
+[data-theme="light"] .t-sun { transform:translateY(-110%);opacity:0; }
+
+/* ── Icon / CV buttons ───── */
+.icon-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border:1px solid var(--border-md);
+  border-radius:10px;color:var(--text-2);text-decoration:none;
+  background:var(--surface);transition:all .2s;cursor:pointer;
+}
+.icon-btn:hover{color:var(--text);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.btn-cv{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.76rem;font-weight:600;
+  color:var(--accent);background:var(--accent-dim);
+  border:1px solid rgba(129,140,248,.22);
+  padding:8px 16px;border-radius:10px;
+  text-decoration:none;transition:all .25s;
+}
+.btn-cv:hover{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 16px var(--accent-glow);}
+
+/* ── Hamburger ───────────── */
+.ham{display:none;flex-direction:column;gap:5px;width:38px;height:38px;align-items:center;justify-content:center;border:1px solid var(--border-md);border-radius:10px;background:var(--surface);cursor:pointer;}
+.ham span{display:block;width:16px;height:1.5px;background:var(--text-2);border-radius:2px;transition:.3s;}
+.ham.open span:nth-child(1){transform:rotate(45deg) translate(4px,4px);}
+.ham.open span:nth-child(2){opacity:0;}
+.ham.open span:nth-child(3){transform:rotate(-45deg) translate(4px,-4px);}
+.mob-menu{display:none;position:fixed;top:68px;inset-inline:0;background:var(--bg);border-bottom:1px solid var(--border);padding:1.5rem 2rem;flex-direction:column;z-index:999;}
+.mob-menu.open{display:flex;}
+.mob-menu a{font-size:.88rem;font-weight:500;color:var(--text-2);text-decoration:none;padding:.8rem 0;border-bottom:1px solid var(--border);transition:color .2s;}
+.mob-menu a:hover{color:var(--accent);}
+
+/* ═══════════════════════════
+   LAYOUT
+═══════════════════════════ */
+.w{max-width:1040px;margin:0 auto;padding:0 2.5rem;position:relative;z-index:2;}
+section{padding:100px 0;border-top:1px solid var(--border);}
+#hero{border:none;}
+
+.sec-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);display:flex;align-items:center;gap:12px;margin-bottom:1.4rem;
+}
+.sec-label::after{content:'';flex:1;max-width:44px;height:1px;background:var(--border-md);}
+.sec-h{
+  font-size:clamp(2rem,4vw,2.8rem);font-weight:700;
+  color:var(--text);letter-spacing:-.03em;line-height:1.1;margin-bottom:2.5rem;
+}
+.sec-h em{font-style:normal;color:var(--accent);}
+
+/* Reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s;}
+.rv.on{opacity:1;transform:none;}
+.d1{transition-delay:.08s;}.d2{transition-delay:.16s;}.d3{transition-delay:.24s;}.d4{transition-delay:.32s;}
+
+/* ═══════════════════════════
+   HERO
+═══════════════════════════ */
+.hero-wrap{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:5rem;padding:68px 0 0;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-dim);
+  border:1px solid rgba(129,140,248,.2);
+  padding:6px 14px;border-radius:100px;margin-bottom:2rem;
+  opacity:0;animation:fadeUp .6s .2s forwards;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero-name{
+  font-size:clamp(3rem,6vw,5rem);font-weight:700;
+  letter-spacing:-.04em;line-height:.92;color:var(--text);
+  margin-bottom:1.2rem;opacity:0;animation:fadeUp .8s .45s forwards;
+}
+.hero-name span{
+  display:block;
+  background:linear-gradient(120deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:.86rem;font-weight:500;color:var(--text-2);
+  letter-spacing:.01em;margin-bottom:1.8rem;
+  opacity:0;animation:fadeUp .8s .7s forwards;
+}
+.hero-desc{
+  color:var(--text-2);font-size:.93rem;line-height:1.85;
+  max-width:480px;margin-bottom:2.5rem;
+  border-left:2px solid var(--border-md);padding-left:1.2rem;
+  opacity:0;animation:fadeIn .5s 1s forwards;min-height:4em;
+}
+.hero-btns{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .8s 1.6s forwards;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  font-size:.8rem;font-weight:600;
+  padding:12px 24px;border-radius:10px;
+  text-decoration:none;transition:all .25s;border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--accent-2);box-shadow:0 8px 24px var(--accent-glow);transform:translateY(-2px);}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--text-2);font-size:.8rem;font-weight:500;
+  padding:12px 24px;border-radius:10px;
+  border:1px solid var(--border-md);text-decoration:none;
+  transition:all .25s;background:var(--surface);
+}
+.btn-secondary:hover{color:var(--text);border-color:var(--border-md);box-shadow:0 4px 16px var(--shadow);}
+
+.hero-right{display:flex;flex-direction:column;gap:1rem;opacity:0;animation:fadeUp .8s .5s forwards;}
+.hero-stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.5rem 1.8rem;transition:all .3s;cursor:default;
+}
+.hero-stat:hover{border-color:var(--border-md);transform:translateX(-4px);box-shadow:0 8px 24px var(--shadow);}
+.hs-num{font-size:2.2rem;font-weight:700;letter-spacing:-.04em;color:var(--text);margin-bottom:4px;}
+.hs-num em{font-style:normal;color:var(--accent);}
+.hs-label{font-size:.74rem;color:var(--text-2);font-weight:500;}
+
+.hero-scroll{
+  display:flex;align-items:center;gap:10px;margin-top:2.5rem;
+  font-size:.66rem;font-weight:500;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;
+  opacity:0;animation:fadeIn 1s 2.2s forwards;
+}
+.hero-scroll-line{width:28px;height:1px;background:var(--muted);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* ═══════════════════════════
+   TICKER
+═══════════════════════════ */
+.ticker{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:13px 0;overflow:hidden;background:var(--surface);
+  position:relative;z-index:2;transition:background .35s,border .35s;
+}
+.ticker-track{display:flex;width:max-content;animation:tickAnim 30s linear infinite;}
+.ticker:hover .ticker-track{animation-play-state:paused;}
+.ticker-track span{
+  font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-2);padding:0 2rem;border-right:1px solid var(--border);white-space:nowrap;
+}
+.ticker-track span.sep{color:var(--muted);}
+@keyframes tickAnim{to{transform:translateX(-50%);}}
+
+/* ═══════════════════════════
+   COMPÉTENCES
+═══════════════════════════ */
+.skill-intro{max-width:580px;color:var(--text-2);font-size:.9rem;line-height:1.8;margin-bottom:2.5rem;}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.f-btn{
+  font-size:.74rem;font-weight:600;
+  border:1px solid var(--border-md);color:var(--text-2);
+  padding:7px 18px;border-radius:100px;background:none;cursor:pointer;transition:all .25s;
+}
+.f-btn:hover{border-color:var(--accent);color:var(--text);}
+.f-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 12px var(--accent-glow);}
+
+.sk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.sk-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.5rem 1.2rem;
+  display:flex;flex-direction:column;gap:.55rem;
+  transition:all .3s;cursor:default;position:relative;overflow:hidden;
+}
+.sk-card::after{
+  content:'';position:absolute;inset:0;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent-dim),transparent);
+  opacity:0;transition:opacity .35s;
+}
+.sk-card:hover{border-color:var(--border-md);transform:translateY(-4px);box-shadow:0 12px 32px var(--shadow);}
+.sk-card:hover::after{opacity:1;}
+.sk-card.hide{display:none;}
+.sk-cat{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);position:relative;z-index:1;}
+.sk-name{font-size:.88rem;font-weight:700;color:var(--text);line-height:1.25;position:relative;z-index:1;transition:color .2s;}
+.sk-card:hover .sk-name{color:var(--accent);}
+.sk-desc{font-size:.75rem;color:var(--text-2);line-height:1.65;position:relative;z-index:1;}
+
+.env-section{margin-top:3.5rem;}
+.env-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.66rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:1.4rem;display:flex;align-items:center;gap:12px;
+}
+.env-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.env-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:1rem 1.2rem;transition:border-color .25s;
+}
+.env-card:hover{border-color:var(--border-md);}
+.env-name{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:3px;}
+.env-type{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+
+/* ═══════════════════════════
+   FORMATION — ORIGINALE
+═══════════════════════════ */
+
+/* Grille : 2 en haut, 1 en bas centrée */
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:1.2rem;
+}
+.form-grid .fc:nth-child(3){
+  grid-column:1 / -1;
+}
+
+.fc{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:2.2rem 2.4rem;
+  position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  min-height:210px;
+}
+.fc:hover{border-color:var(--border-md);box-shadow:0 16px 48px var(--shadow);}
+
+/* Grande année décorative en fond */
+.fc-year-bg{
+  position:absolute;
+  right:-0.05em;top:50%;transform:translateY(-52%);
+  font-size:clamp(5.5rem,12vw,9rem);
+  font-weight:700;letter-spacing:-.05em;line-height:1;
+  color:transparent;
+  -webkit-text-stroke:1px var(--border-md);
+  user-select:none;pointer-events:none;
+  transition:-webkit-text-stroke .35s;
+}
+.fc:hover .fc-year-bg{-webkit-text-stroke-color:var(--border-md); opacity:.7;}
+
+/* Contenu */
+.fc-content{position:relative;z-index:1;}
+.fc-status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.63rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-dim);
+  border:1px solid rgba(129,140,248,.2);
+  padding:3px 10px;border-radius:100px;margin-bottom:1rem;
+}
+.fc-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:livePulse 1.8s infinite;}
+.fc-degree{
+  font-size:clamp(1rem,2vw,1.25rem);font-weight:700;
+  color:var(--text);letter-spacing:-.02em;line-height:1.3;margin-bottom:.5rem;
+}
+.fc-school{font-size:.8rem;color:var(--text-2);font-weight:500;}
+
+/* Barre de durée en bas */
+.fc-bar{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--border);border-radius:0 0 18px 18px;overflow:hidden;
+}
+.fc-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  border-radius:0 0 18px 18px;
+  transition:width 1.4s cubic-bezier(.1,.5,.5,1);
+  width:0%;
+}
+.fc-bar-fill.run{width:var(--pct);}
+
+/* Petite étiquette "durée" */
+.fc-meta{
+  position:absolute;top:2rem;left:2.4rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem;color:var(--muted);letter-spacing:.1em;
+}
+
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.6);}}
+
+/* ═══════════════════════════
+   TRAVAUX
+═══════════════════════════ */
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:all .3s;}
+.pc:hover{border-color:var(--border-md);transform:translateY(-6px);box-shadow:0 20px 48px var(--shadow);}
+.pc-img{height:140px;overflow:hidden;background:var(--surface-2);position:relative;}
+.pc-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);transition:transform .5s,filter .5s;}
+.pc:hover .pc-img img{transform:scale(1.06);filter:brightness(1);}
+.pc-img-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--surface) 100%);}
+.pc-body{padding:1.2rem;flex:1;display:flex;flex-direction:column;gap:.55rem;}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.pc-title{font-size:.88rem;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.pc-badge{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.58rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;
+  background:var(--accent-dim);color:var(--accent);
+  border:1px solid rgba(129,140,248,.2);
+  padding:2px 8px;border-radius:4px;white-space:nowrap;
+}
+.pc-desc{font-size:.77rem;color:var(--text-2);line-height:1.65;flex:1;}
+.pc-link{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;color:var(--accent);text-decoration:none;margin-top:.5rem;transition:gap .2s;}
+.pc-link:hover{gap:10px;}
+.pc-empty{border-style:dashed;opacity:.3;display:flex;align-items:center;justify-content:center;min-height:200px;}
+.pc-empty-in{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.pc-empty-in p{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:500;}
+
+/* ═══════════════════════════
+   VEILLE
+═══════════════════════════ */
+.veille-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+.vcard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.6rem;
+  display:flex;flex-direction:column;gap:.85rem;
+  transition:border-color .3s,box-shadow .3s;position:relative;overflow:hidden;
+}
+.vcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scaleX(0);transform-origin:left;transition:transform .5s;}
+.vcard:hover::before{transform:scaleX(1);}
+.vcard:hover{box-shadow:0 8px 32px var(--shadow);}
+.vcard-status{display:flex;align-items:center;gap:7px;font-size:.72rem;font-weight:600;}
+.vdot{width:7px;height:7px;border-radius:50%;}
+.vdot.now{background:#22c55e;animation:livePulse 1.8s infinite;}
+.vdot.soon{background:#f59e0b;}
+.vcard-topic{font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.vcard-desc{font-size:.78rem;color:var(--text-2);line-height:1.7;}
+
+/* ═══════════════════════════
+   CONTACT
+═══════════════════════════ */
+.contact-wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:6rem;align-items:start;}
+.c-prompt{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:.75rem;}
+.c-email{
+  font-size:clamp(1.1rem,2.2vw,1.5rem);font-weight:700;letter-spacing:-.02em;
+  color:var(--text);text-decoration:none;display:block;margin-bottom:2rem;
+  padding-bottom:.6rem;border-bottom:2px solid var(--border-md);transition:color .2s,border-color .2s;
+}
+.c-email:hover{color:var(--accent);border-color:var(--accent);}
+.c-note{font-size:.88rem;color:var(--text-2);line-height:1.8;}
+.info-table{width:100%;border-collapse:collapse;}
+.info-table tr{border-bottom:1px solid var(--border);}
+.info-table td{padding:.9rem 0;font-size:.8rem;}
+.info-table td:first-child{color:var(--muted);width:44%;font-weight:500;}
+.info-table td:last-child{color:var(--text);font-weight:600;}
+.info-table .acc{color:var(--accent);}
+.info-table a{color:var(--accent);text-decoration:none;}
+.info-table a:hover{text-decoration:underline;}
+
+/* ═══════════════════════════
+   FOOTER
+═══════════════════════════ */
+footer{border-top:1px solid var(--border);padding:1.6rem 2.5rem;display:flex;justify-content:space-between;align-items:center;max-width:1040px;margin:0 auto;position:relative;z-index:2;}
+.f-l,.f-r{font-size:.7rem;color:var(--muted);}
+
+/* ═══════════════════════════
+   BTT
+═══════════════════════════ */
+#btt{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;background:var(--surface);border:1px solid var(--border-md);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);opacity:0;visibility:hidden;transform:translateY(16px);transition:all .35s;z-index:100;box-shadow:0 4px 16px var(--shadow);}
+#btt.show{opacity:1;visibility:visible;transform:translateY(0);}
+#btt:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-3px);}
+
+/* ═══════════════════════════
+   RESPONSIVE
+═══════════════════════════ */
+@media(max-width:960px){
+  .hero-wrap{grid-template-columns:1fr;padding-top:100px;gap:3rem;}
+  .hero-right{flex-direction:row;flex-wrap:wrap;}
+  .hero-stat{flex:1;min-width:140px;}
+  .sk-grid{grid-template-columns:repeat(2,1fr);}
+  .env-grid{grid-template-columns:repeat(2,1fr);}
+  .proj-grid{grid-template-columns:1fr 1fr;}
+  .veille-grid{grid-template-columns:1fr 1fr;}
+  .contact-wrap{grid-template-columns:1fr;gap:3rem;}
+  .form-grid{grid-template-columns:1fr;}
+  .form-grid .fc:nth-child(3){grid-column:auto;}
+  .nav-links{display:none;}
+  .ham{display:flex;}
+}
+@media(max-width:600px){
+  .sk-grid,.proj-grid,.env-grid,.veille-grid{grid-template-columns:1fr;}
+  .hero-name{font-size:2.6rem;}
+  .nav{padding:0 1.5rem;}
+  .w{padding:0 1.5rem;}
+  footer{padding:1.5rem;}
+  .fc-year-bg{font-size:5rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav" id="nav">
+  <a href="#hero" class="nav-logo">
+    <span class="nav-logo-mark">NLG</span>
+    Nino LG
+  </a>
+  <ul class="nav-links">
+    <li><a href="#competences">Compétences</a></li>
+    <li><a href="#formation">Formation</a></li>
+    <li><a href="#projets">Travaux</a></li>
+    <li><a href="#veille">Veille</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-r">
+
+    <!-- Toggle premium : un seul bouton, icône qui glisse -->
+    <button class="theme-btn" id="theme-toggle" aria-label="Changer le thème">
+      <!-- En dark → soleil affiché (pour aller en clair) -->
+      <span class="t-icon t-sun">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </span>
+      <!-- En light → lune affichée (pour aller en sombre) -->
+      <span class="t-icon t-moon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </span>
+    </button>
+
+    <a href="https://www.linkedin.com/in/nino-larivi%C3%A8re-gillet-503276248/" target="_blank" class="icon-btn" aria-label="LinkedIn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </a>
+
+    <!-- CV → documents/cv.pdf -->
+    <a href="documents/cv.pdf" target="_blank" class="btn-cv">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      CV
+    </a>
+
+    <button class="ham" id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mob-menu" id="mob">
+  <a href="#competences">Compétences</a>
+  <a href="#formation">Formation</a>
+  <a href="#projets">Travaux</a>
+  <a href="#veille">Veille</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="w">
+    <div class="hero-wrap">
+      <div class="hero-left">
+        <div class="hero-badge"><span class="hero-badge-dot"></span>Recherche alternance · 2026 – 2027</div>
+        <h1 class="hero-name">Nino<br><span>Larivière-Gillet</span></h1>
+        <p class="hero-sub">Étudiant BTS SIO — SISR · AFTEC Rennes</p>
+        <div class="hero-desc"><div id="tw"></div></div>
+        <div class="hero-btns">
+          <a href="#projets" class="btn-primary">Voir mes travaux <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+          <a href="mailto:nlarivie35@gmail.com" class="btn-secondary">Me contacter</a>
+          <a href="documents/cv.pdf" target="_blank" class="btn-secondary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>CV PDF</a>
+        </div>
+        <div class="hero-scroll"><div class="hero-scroll-line"></div><span>Scroll</span></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat rv"><div class="hs-num"><em>BTS</em> SIO</div><div class="hs-label">Option SISR — Infrastructure Systèmes & Réseaux</div></div>
+        <div class="hero-stat rv d1"><div class="hs-num">5</div><div class="hs-label">Documentations techniques rédigées</div></div>
+        <div class="hero-stat rv d2"><div class="hs-num">2026</div><div class="hs-label">Disponible pour alternance dès maintenant</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TICKER ══ -->
+<div class="ticker" style="position:relative;z-index:2;">
+  <div class="ticker-track">
+    <span>Active Directory</span><span class="sep">·</span><span>DNS</span><span class="sep">·</span><span>DHCP</span><span class="sep">·</span><span>Windows Server</span><span class="sep">·</span><span>Linux Debian</span><span class="sep">·</span><span>Virtualisation</span><span class="sep">·</span><span>ESXi</span><span class="sep">·</span><span>Proxmox</span><span class="sep">·</span><span>Cybersécurité</span><span class="sep">·</span><span>Réseaux</span><span class="sep">·</span><span>BTS SIO SISR</span><span class="sep">·</span><span>Infrastructure</span><span class="sep">·</span>
+    <span>Active Directory</span><span class="sep">·</span><span>DNS</span><span class="sep">·</span><span>DHCP</span><span class="sep">·</span><span>Windows Server</span><span class="sep">·</span><span>Linux Debian</span><span class="sep">·</span><span>Virtualisation</span><span class="sep">·</span><span>ESXi</span><span class="sep">·</span><span>Proxmox</span><span class="sep">·</span><span>Cybersécurité</span><span class="sep">·</span><span>Réseaux</span><span class="sep">·</span><span>BTS SIO SISR</span><span class="sep">·</span><span>Infrastructure</span><span class="sep">·</span>
+  </div>
+</div>
+
+<!-- ══ COMPÉTENCES ══ -->
+<section id="competences">
+  <div class="w">
+    <div class="sec-label rv">01</div>
+    <h2 class="sec-h rv">Compétences</h2>
+    <p class="skill-intro rv">Mes domaines techniques acquis en formation SISR et en pratique. Filtrez par catégorie.</p>
+    <div class="filters rv d1">
+      <button class="f-btn active" data-f="all">Tous</button>
+      <button class="f-btn" data-f="os">OS & Serveurs</button>
+      <button class="f-btn" data-f="reseau">Réseaux & Services</button>
+      <button class="f-btn" data-f="virt">Virtualisation</button>
+      <button class="f-btn" data-f="dev">Web & Outils</button>
+    </div>
+    <div class="sk-grid" id="sg">
+      <div class="sk-card rv" data-cat="os"><span class="sk-cat">OS & Serveurs</span><span class="sk-name">Windows 10 / 11</span><span class="sk-desc">Installation, configuration et maintenance de postes clients Windows en environnement professionnel.</span></div>
+      <div class="sk-card rv d1" data-cat="os"><span class="sk-cat">OS & Serveurs</span><span class="sk-name">Windows Server 2022 / 2025</span><span class="sk-desc">Déploiement de rôles serveur : AD DS, DNS, DHCP, gestion des OU et stratégies de groupe.</span></div>
+      <div class="sk-card rv d2" data-cat="os"><span class="sk-cat">OS & Serveurs</span><span class="sk-name">Linux Debian / Ubuntu</span><span class="sk-desc">Administration en ligne de commande, configuration réseau, gestion des services système.</span></div>
+      <div class="sk-card rv d3" data-cat="reseau"><span class="sk-cat">Réseaux & Services</span><span class="sk-name">Active Directory</span><span class="sk-desc">Déploiement AD DS, gestion des utilisateurs, groupes, Unités d'Organisation et GPO.</span></div>
+      <div class="sk-card rv" data-cat="reseau"><span class="sk-cat">Réseaux & Services</span><span class="sk-name">DNS</span><span class="sk-desc">Configuration de zones DNS directes et inversées sur Windows Server et Debian.</span></div>
+      <div class="sk-card rv d1" data-cat="reseau"><span class="sk-cat">Réseaux & Services</span><span class="sk-name">DHCP</span><span class="sk-desc">Mise en place de serveurs DHCP, plages d'adresses et réservations statiques.</span></div>
+      <div class="sk-card rv d2" data-cat="virt"><span class="sk-cat">Virtualisation</span><span class="sk-name">VMware ESXi</span><span class="sk-desc">Déploiement et gestion de machines virtuelles sur hyperviseur ESXi.</span></div>
+      <div class="sk-card rv d3" data-cat="virt"><span class="sk-cat">Virtualisation</span><span class="sk-name">Proxmox VE</span><span class="sk-desc">Création et administration de VMs et conteneurs LXC sur Proxmox.</span></div>
+      <div class="sk-card rv" data-cat="dev"><span class="sk-cat">Web & Outils</span><span class="sk-name">WordPress</span><span class="sk-desc">Migration local → serveur distant, gestion base de données et wp-config.</span></div>
+      <div class="sk-card rv d1" data-cat="dev"><span class="sk-cat">Web & Outils</span><span class="sk-name">phpMyAdmin / SQL</span><span class="sk-desc">Export/import de bases de données MySQL, requêtes de base.</span></div>
+      <div class="sk-card rv d2" data-cat="dev"><span class="sk-cat">Web & Outils</span><span class="sk-name">FTP / FileZilla</span><span class="sk-desc">Transferts de fichiers sécurisés entre client et serveur distant.</span></div>
+      <div class="sk-card rv d3" data-cat="reseau"><span class="sk-cat">Réseaux & Services</span><span class="sk-name">Cisco Packet Tracer</span><span class="sk-desc">Simulation de topologies réseau, configuration de switches et routeurs.</span></div>
+    </div>
+    <div class="env-section rv">
+      <div class="env-label">Environnements & outils</div>
+      <div class="env-grid">
+        <div class="env-card rv"><div class="env-name">VirtualBox / VMware</div><div class="env-type">Virtualisation</div></div>
+        <div class="env-card rv d1"><div class="env-name">VS Code</div><div class="env-type">Éditeur</div></div>
+        <div class="env-card rv d2"><div class="env-name">Wireshark</div><div class="env-type">Analyse réseau</div></div>
+        <div class="env-card rv"><div class="env-name">PowerShell</div><div class="env-type">Scripting Windows</div></div>
+        <div class="env-card rv d1"><div class="env-name">Bash</div><div class="env-type">Scripting Linux</div></div>
+        <div class="env-card rv d2"><div class="env-name">Cisco Packet Tracer</div><div class="env-type">Simulation réseau</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FORMATION ══ -->
+<section id="formation">
+  <div class="w">
+    <div class="sec-label rv">02</div>
+    <h2 class="sec-h rv">Formation</h2>
+    <div class="form-grid">
+
+      <!-- BTS SIO -->
+      <div class="fc rv">
+        <div class="fc-year-bg">2027</div>
+        <div class="fc-meta">2025 — 2027</div>
+        <div class="fc-content">
+          <div class="fc-status"><span class="fc-dot"></span>En cours</div>
+          <div class="fc-degree">BTS SIO — Option SISR</div>
+          <div class="fc-school">AFTEC · Rennes</div>
+        </div>
+        <div class="fc-bar"><div class="fc-bar-fill" style="--pct:45%"></div></div>
+      </div>
+
+      <!-- Licence -->
+      <div class="fc rv d1">
+        <div class="fc-year-bg">2024</div>
+        <div class="fc-meta">2021 — 2024</div>
+        <div class="fc-content">
+          <div class="fc-degree">Licence Économie-Gestion</div>
+          <div class="fc-school">Faculté de Sciences Économiques · Université Rennes 1</div>
+        </div>
+        <div class="fc-bar"><div class="fc-bar-fill" style="--pct:100%"></div></div>
+      </div>
+
+      <!-- Bac -->
+      <div class="fc rv d2">
+        <div class="fc-year-bg">2021</div>
+        <div class="fc-meta">2021</div>
+        <div class="fc-content">
+          <div class="fc-degree">Baccalauréat général — Mention Assez Bien</div>
+          <div class="fc-school">Lycée Saint-Martin · Rennes</div>
+        </div>
+        <div class="fc-bar"><div class="fc-bar-fill" style="--pct:100%"></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRAVAUX ══ -->
+<section id="projets">
+  <div class="w">
+    <div class="sec-label rv">03</div>
+    <h2 class="sec-h rv">Travaux & <em>Documentations</em></h2>
+    <!--
+    ╔══════════════════════════════════════╗
+    ║  REMPLACER UN PDF :                  ║
+    ║  1. Déposer dans /documents/         ║
+    ║  2. Modifier le href "Consulter →"   ║
+    ║  3. Remplacer l'image dans /img/     ║
+    ╚══════════════════════════════════════╝
+    -->
+    <div class="proj-grid">
+      <article class="pc rv">
+        <div class="pc-img"><img src="img/ws.jpg" alt="Admin WS" onerror="this.style.display='none'"><div class="pc-img-ov"></div></div>
+        <div class="pc-body"><div class="pc-top"><h3 class="pc-title">Admin. Windows Server</h3><span class="pc-badge">PDF</span></div><p class="pc-desc">Déploiement AD DS, OU, utilisateurs, groupes et DNS sur Windows Server 2022.</p><a href="documents/docws.pdf" target="_blank" class="pc-link">Consulter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a></div>
+      </article>
+      <article class="pc rv d1">
+        <div class="pc-img"><img src="img/public.avif" alt="WordPress" onerror="this.style.display='none'"><div class="pc-img-ov"></div></div>
+        <div class="pc-body"><div class="pc-top"><h3 class="pc-title">Migration WordPress</h3><span class="pc-badge">PDF</span></div><p class="pc-desc">Migration local → serveur : FTP, export/import SQL phpMyAdmin, wp-config.php.</p><a href="documents/wordpress.pdf" target="_blank" class="pc-link">Consulter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a></div>
+      </article>
+      <article class="pc rv d2">
+        <div class="pc-img"><img src="img/windows11-microsoft.jpg" alt="W11" onerror="this.style.display='none'"><div class="pc-img-ov"></div></div>
+        <div class="pc-body"><div class="pc-top"><h3 class="pc-title">Installation Windows 11</h3><span class="pc-badge">PDF</span></div><p class="pc-desc">Procédure complète d'installation et configuration d'un poste Windows 11 professionnel.</p><a href="documents/w11doc.pdf" target="_blank" class="pc-link">Consulter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a></div>
+      </article>
+      <article class="pc rv">
+        <div class="pc-img"><img src="img/ws-2025.jpg" alt="DHCP WS" onerror="this.style.display='none'"><div class="pc-img-ov"></div></div>
+        <div class="pc-body"><div class="pc-top"><h3 class="pc-title">DHCP & DNS — WS 2025</h3><span class="pc-badge">PDF</span></div><p class="pc-desc">Installation et configuration des services DHCP et DNS sur Windows Server 2025.</p><a href="documents/doc-ws-dhcp+dns.pdf" target="_blank" class="pc-link">Consulter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a></div>
+      </article>
+      <article class="pc rv d1">
+        <div class="pc-img"><img src="img/debian-13.png" alt="DHCP Debian" onerror="this.style.display='none'"><div class="pc-img-ov"></div></div>
+        <div class="pc-body"><div class="pc-top"><h3 class="pc-title">DHCP & DNS — Debian 13</h3><span class="pc-badge">PDF</span></div><p class="pc-desc">Configuration DHCP et DNS sur serveur Debian 13 en ligne de commande.</p><a href="documents/doc-debian-dhcp+dns.pdf" target="_blank" class="pc-link">Consulter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a></div>
+      </article>
+      <article class="pc pc-empty rv d2">
+        <div class="pc-empty-in"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><p>Prochain document</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VEILLE ══ -->
+<section id="veille">
+  <div class="w">
+    <div class="sec-label rv">04</div>
+    <h2 class="sec-h rv">Veille <em>technologique</em></h2>
+    <p class="skill-intro rv">Ce que je suis, j'explore et j'apprends en ce moment.</p>
+    <div class="veille-grid">
+      <div class="vcard rv"><div class="vcard-status"><span class="vdot now"></span><span style="color:#22c55e;font-size:.72rem;font-weight:600;">En cours</span></div><div class="vcard-topic">Cybersécurité offensive — bases</div><div class="vcard-desc">Exploration de TryHackMe : scans Nmap, fondamentaux du pentesting et vulnérabilités réseau courantes.</div></div>
+      <div class="vcard rv d1"><div class="vcard-status"><span class="vdot now"></span><span style="color:#22c55e;font-size:.72rem;font-weight:600;">En cours</span></div><div class="vcard-topic">Scripting PowerShell</div><div class="vcard-desc">Automatisation des tâches d'administration Windows et gestion des utilisateurs Active Directory par scripts.</div></div>
+      <div class="vcard rv d2"><div class="vcard-status"><span class="vdot soon"></span><span style="color:#f59e0b;font-size:.72rem;font-weight:600;">À venir</span></div><div class="vcard-topic">Certification CompTIA Network+</div><div class="vcard-desc">Préparation à la certification internationale pour valider les connaissances en infrastructure réseau.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact">
+  <div class="w">
+    <div class="sec-label rv">05</div>
+    <h2 class="sec-h rv">Contact</h2>
+    <div class="contact-wrap">
+      <div class="rv">
+        <p class="c-prompt">Écrivez-moi directement</p>
+        <a href="mailto:nlarivie35@gmail.com" class="c-email">nlarivie35@gmail.com</a>
+        <p class="c-note">Vous cherchez un alternant motivé en BTS SIO SISR pour 2026–2027 ? N'hésitez pas à me contacter, je serai ravi d'échanger.</p>
+      </div>
+      <div class="rv d2">
+        <table class="info-table">
+          <tr><td>Localisation</td><td>Rennes, France</td></tr>
+          <tr><td>École</td><td>AFTEC Rennes</td></tr>
+          <tr><td>Formation</td><td>BTS SIO — SISR</td></tr>
+          <tr><td>Disponible</td><td class="acc"><span class="fc-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;animation:livePulse 1.8s infinite;"></span>Alternance 2026–2027</td></tr>
+          <tr><td>LinkedIn</td><td><a href="https://www.linkedin.com/in/nino-larivi%C3%A8re-gillet-503276248/" target="_blank">Voir le profil →</a></td></tr>
+          <tr><td>CV</td><td><a href="documents/cv.pdf" target="_blank">Télécharger →</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="f-l">Nino Larivière-Gillet</span>
+  <span class="f-r">© 2026 — Tous droits réservés</span>
+</footer>
+
+<button id="btt" aria-label="Retour en haut">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+</button>
+
+<script>
+/* THEME */
+const html = document.documentElement;
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+});
+
+/* NAV */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('on', scrollY > 40), { passive: true });
+
+/* HAM */
+const ham = document.getElementById('ham'), mob = document.getElementById('mob');
+ham.addEventListener('click', () => { ham.classList.toggle('open'); mob.classList.toggle('open'); });
+mob.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { ham.classList.remove('open'); mob.classList.remove('open'); }));
+
+/* PROGRESS */
+window.addEventListener('scroll', () => {
+  const p = document.documentElement;
+  document.getElementById('prog').style.width = ((p.scrollTop / (p.scrollHeight - p.clientHeight)) * 100) + '%';
+}, { passive: true });
+
+/* BTT */
+const btt = document.getElementById('btt');
+window.addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 500), { passive: true });
+btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* TYPEWRITER */
+const TXT = `Passionné par l'administration réseau et la cybersécurité. Motivé, rigoureux et curieux, je cherche une alternance pour développer mes compétences et contribuer à des projets informatiques concrets.`;
+let ti = 0;
+const tw = document.getElementById('tw');
+function type() {
+  if (ti <= TXT.length) {
+    tw.innerHTML = TXT.slice(0, ti) + (ti < TXT.length ? '<span style="opacity:.7;color:var(--accent)">|</span>' : '');
+    ti++;
+    setTimeout(type, ti === 1 ? 1400 : 22 + Math.random() * 16);
+  }
+}
+setTimeout(type, 1600);
+
+/* REVEAL */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+/* FORMATION bars */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.querySelector('.fc-bar-fill')?.classList.add('run'); barObs.unobserve(e.target); } });
+}, { threshold: 0.3 });
+document.querySelectorAll('.fc').forEach(el => barObs.observe(el));
+
+/* FILTERS */
+document.querySelectorAll('.f-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.f;
+    document.querySelectorAll('.sk-card').forEach(sk => sk.classList.toggle('hide', f !== 'all' && sk.dataset.cat !== f));
+  });
+});
+</script>
+</body>
+</html>
